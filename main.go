@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -9,14 +11,25 @@ func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Используйте: ./cat-project 'название файла'")
 	}
-	Args()
+	Slice := os.Args[1:]
+	Args(Slice)
 }
-func Args() {
-	for i := 1; i < len(os.Args); i++ {
-		fileData, err := os.ReadFile(os.Args[i])
+
+func Args(Slice []string) {
+	for i := 0; i < len(Slice); i++ {
+		file, err := os.Open(Slice[i])
 		if err != nil {
-			fmt.Println("Ошибка: ", os.Args[i], err)
+			log.Fatal(err)
 		}
-		fmt.Println(string(fileData))
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
+		}
+
+		if err := scanner.Err(); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
